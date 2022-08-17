@@ -38,8 +38,6 @@ class SelfAttention(nn.Module):
         # [N, q, h, hd] nqhd, [n, k, h, d] nkhd => nqhd
 
         energy = torch.einsum("nqhd,nkhd->nhqk", [queries, keys])
-        # queries shape: (N, query_len, heads, heads_dim),
-        # keys shape: (N, key_len, heads, heads_dim)
         # energy: (N, heads, query_len, key_len)
 
         # Mask padded indices so their weights become 0
