@@ -35,7 +35,7 @@ class SelfAttention(nn.Module):
 
         # Einsum does matrix mult. for query*keys for each training example
         # with every other training example, don't be confused by einsum
-        # [N, q, h, hd] nqhd, [n, k, h, d] nkhd => nqhd
+        # [N, q, h, hd] nqhd, [n, k, h, d] nkhd => nhqk
 
         energy = torch.einsum("nqhd,nkhd->nhqk", [queries, keys])
         # energy: (N, heads, query_len, key_len)
