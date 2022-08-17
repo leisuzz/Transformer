@@ -44,19 +44,13 @@ class SelfAttention(nn.Module):
         if mask is not None:
             energy = energy.masked_fill(mask == 0, float("-1e20"))
 
-        # Normalize energy values similarly to seq2seq + attention
-        # so that they sum to 1. Also divide by scaling factor for
+        # Normalize energy values so that they sum to 1. Also divide by scaling factor for
         # better stability
-        attention = torch.softmax(energy / (self.embed_size ** (1 / 2)), dim=3)
-        # attention shape: (N, heads, query_len, key_len)
+        attention = torch.softmax(energy / (self.embed_size ** (1 / 2)), dim=3)     # nhqk
 
         out = torch.einsum("nhql,nlhd->nqhd", [attention, values]).reshape(
             N, query_len, self.heads * self.head_dim
-        )
-        # attention shape: (N, heads, query_len, key_len)
-        # values shape: (N, value_len, heads, heads_dim)
-        # out after matrix multiply: (N, query_len, heads, head_dim), then
-        # we reshape and flatten the last two dimensions.
+        )                       # reshape and flatten the last two dimensions.
 
         out = self.fc_out(out)
         # Linear layer doesn't modify the shape, final shape will be
@@ -125,6 +119,8 @@ class Encoder(nn.Module):
 
     def forward(self, x, mask):
         N, seq_length = x.shape
+        
+        # [0, seq_len) => shape [N, seq_len]
         positions = torch.arange(0, seq_length).expand(N, seq_length).to(self.device)
         out = self.dropout(
             (self.word_embedding(x) + self.position_embedding(positions))
