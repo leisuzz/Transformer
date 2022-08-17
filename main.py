@@ -35,7 +35,6 @@ class SelfAttention(nn.Module):
 
         # Einsum does matrix mult. for query*keys for each training example
         # with every other training example, don't be confused by einsum
-        # it's just how I like doing matrix multiplication & bmm
 
         energy = torch.einsum("nqhd,nkhd->nhqk", [queries, keys])
         # queries shape: (N, query_len, heads, heads_dim),
